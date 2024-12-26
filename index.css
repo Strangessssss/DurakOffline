@@ -21,8 +21,13 @@ body{
     width: 30rem;
 }
 
+.hand .card.on-hand {
+    rotate: calc(var(--deg));
+}
+
 .bot-card{
     width: 7rem;
+    position: absolute;
 }
 
 #table{
@@ -36,6 +41,7 @@ body{
     justify-content: center;
     gap: 2rem;
     flex-flow: row wrap;
+    transition: transform 10s ease;
 }
 
 #bat{
@@ -44,9 +50,9 @@ body{
     rotate: 90deg;
 }
 
-#bot-hand { top: -4rem; }
+#bot-hand { top: 2rem; }
 
-#user-hand { bottom: -4rem; }
+#user-hand { bottom: 4rem; }
 
 
 #deck{
@@ -76,15 +82,17 @@ body{
 
 .card{
     position: absolute;
+    width: 8rem;
 }
 
 .on-drag{
     width: 10rem;
+    rotate: 0;
     animation: card-growing 0.2s 1;
 }
 
 .on-hand{
-    position: relative;
+    position: absolute;
     width: 8rem;
 }
 

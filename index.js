@@ -49,7 +49,7 @@ function fillDeck() {
     }
 }
 
-function botAttacks(){
+function botAnswers(){
     let botHandTemp = [...botHand];
     let answers = []
     let answered;
@@ -77,7 +77,39 @@ function botAttacks(){
         botHand.splice(botHand.indexOf(answer.answer), 1);
     }
     return {answered, answers};
+}
 
+function botAttacks(){
+    let botHandTemp = [...botHand];
+    let attackCards = [];
+    if (table.length === 0){
+        let value = botHandTemp[getLeastCardIndex(botHandTemp)].value;
+
+        for (const card of botHandTemp) {
+            if (card.value === value){
+                attackCards.push(card);
+            }
+        }
+        return attackCards;
+    }
+    else{
+        let values = []
+        for (const stack of stacks) {
+            for (const card of stack) {
+                if (!values.includes(card.value)){
+                    values.push(card.value);
+                }
+            }
+        }
+        for (const value of values) {
+            for (const card of botHandTemp) {
+                if (card.value === value){
+                    attackCards.push(card);
+                }
+            }
+        }
+        return attackCards;
+    }
 }
 
 function handOut(userFirst){
@@ -137,7 +169,6 @@ function getLeastCardIndex(cards){
 }
 
 function canAttack(attackCard, lyingCard) {
-
     let attackCardTrump = attackCard.suit === trumpCard.suit;
     let lyingCardTrump = lyingCard.suit === trumpCard.suit;
     // conditions with trump cards
@@ -205,6 +236,7 @@ let $deck = $("#deck");
 let functionBut = $("#function");
 
 $(function(){
+
     fillDeck();
     handOut(true);
 
@@ -225,7 +257,67 @@ $(function(){
     handOut(userGoes);
     $handOut(userGoes);
 
+    // userGoes = isUserFirst(); RETURN
+    userGoes = true;
+
+    alignCards()
 })
+
+function isUserFirst(){
+    const botTrumpCards = []
+    const userTrumpCards = []
+
+    for (const card of userHand) {
+        if (card.suit === trumpCard.suit){
+            userTrumpCards.push(card);
+        }
+    }
+
+    for (const card of botHand) {
+        if (card.suit === trumpCard.suit){
+            botTrumpCards.push(card);
+        }
+    }
+
+    if (userTrumpCards.length === 0 || botTrumpCards.length === 0) {
+        return Math.floor(Math.random() * 2);
+    }
+    else{
+        return cardValue(botTrumpCards[getLeastCardIndex(botTrumpCards)]) > cardValue(userTrumpCards[getLeastCardIndex(userTrumpCards)]);
+    }
+}
+
+function alignCards(){
+    const botHandCards = $botHand.children();
+    const userHandCards = $userHand.children();
+    botHandCards.each((index, card) => {
+        $(card).css({
+            "rotate": (-getDegreeByIndex(index, botHandCards.length)).toString() + "deg",
+            "left": getCardPosition(index, botHandCards.length, $botHand.outerWidth()).toString() + "px",
+        });
+    });
+    userHandCards.each((index, card) => {
+        $(card).css({
+            "rotate": getDegreeByIndex(index, userHandCards.length).toString() + "deg",
+            "left": getCardPosition(index, userHandCards.length, $userHand.outerWidth()).toString() + "px",
+        });
+    });
+}
+
+function getDegreeByIndex(index, length) {
+    const range = 40;
+    const start = -20;
+    if (length === 1) return 0;
+    const step = range / (length - 1);
+    return start + step * index;
+}
+
+function getCardPosition(index, totalCards, containerWidth) {
+    let rangeX = 400;
+    const startX = (containerWidth - rangeX) / 2;
+    const stepX = totalCards > 1 ? rangeX / (totalCards - 1) : 0;
+    return startX + stepX * index;
+}
 
 
 function dragElement(draggableElem) {
@@ -245,8 +337,10 @@ function dragElement(draggableElem) {
         $("body").append(draggableElem);
         draggableElem.removeClass("on-hand");
         draggableElem.addClass("on-drag");
+        draggableElem.css("rotate", '');
         draggableElem.css("left", e.clientX - HookX + 'px');
         draggableElem.css("top", e.clientY - HookY + 'px');
+        alignCards();
     }
 
     function replaceElem(e) {
@@ -262,14 +356,16 @@ function dragElement(draggableElem) {
         draggableElem.off("mouseup mouseout mousemove");
         draggableElem.removeClass("on-drag");
 
-        // sets the card's position to 0 to avoid render errors
-        draggableElem.css("left", '');
-        draggableElem.css("top", '');
+
 
         // if the card does not appropriate or user puts it wrong way
         if (!IsIn(e.clientX, e.clientY, table.offset().left, table.offset().top, table.outerWidth(), table.outerHeight())) {
+            // sets the card's position to 0 to avoid render errors
+            draggableElem.css("left", '');
+            draggableElem.css("top", '');
             $userHand.append(draggableElem);
             draggableElem.addClass("on-hand");
+            alignCards();
             return;
         }
 
@@ -285,13 +381,8 @@ function dragElement(draggableElem) {
                 stack.offsetLeft,
                 stack.offsetTop,
                 $stack.outerWidth(),
-                $stack.outerHeight()) && canAttack(card, lyingCard) 
+                $stack.outerHeight()) && canAttack(card, lyingCard)
             ) {
-                // sets the card's html before putting on table in html
-                draggableElem.addClass("on-table");
-                draggableElem.off("mousedown");
-                draggableElem.css("rotate",  (Math.random() * 10 - Math.random() * 10) + 'deg');
-
                 userAttacks(card, lyingCard);
 
                 // adds the card to stack
@@ -299,36 +390,41 @@ function dragElement(draggableElem) {
                 return;
             }
         }
-        if (canUse(card, null)){
+        if (canUse(card, null) && userGoes){
+
             userGoes = true;
-            // sets the card's html before putting on table in html
-            draggableElem.addClass("on-table");
+
             draggableElem.off("mousedown");
-            draggableElem.css("rotate",  (Math.random() * 10 - Math.random() * 10) + 'deg');
 
             // sets the logic before putting card on table in html
             userAttacks(card, null);
             // puts card on table ( not on the other card )
             putCardOnTable(card, null, draggableElem);
 
-            let botAttack = botAttacks()
-            for (const answer of botAttack.answers) {
-                if (answer.answer === undefined){
-                    continue;
-                }
-
-                setTimeout(() =>{
-                    putCardOnTable(answer.answer, $(table.children()[answer.lyingCardIdx]), null)
-                    $botHand.children().last().remove();
-                }, Math.random() * 1000);
-            }
+            // let botAttack = botAnswers() // RETURN
+            // for (const answer of botAttack.answers) {
+            //     if (answer.answer === undefined){
+            //         continue;
+            //     }
+            //
+            //     setTimeout(() =>{
+            //         putCardOnTable(answer.answer, $(table.children()[answer.lyingCardIdx]), null)
+            //         $botHand.children().last().remove();
+            //     }, Math.random() * 1000);
+            // }
+            alignCards();
 
             functionBut.css("visibility", "visible");
             functionBut.text("Bat!")
             return;
         }
+        // sets the card's position to 0 to avoid render errors
+        draggableElem.css("left", '');
+        draggableElem.css("top", '');
         $userHand.append(draggableElem);
         draggableElem.addClass("on-hand");
+        alignCards();
+
     }
 }
 
@@ -384,6 +480,7 @@ function $fillUserHand(){
 
         dragElement($card);
     }
+
 }
 
 function bat(cardsCount) {
@@ -398,14 +495,19 @@ function bat(cardsCount) {
 }
 
 function putCardOnTable(card, stack, elem){
+    let cardOnTable;
+    let rotate;
     if (stack === null){
         table.append("<div class='stack'>")
         table.children().last().append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt="">`);
-        table.children().last().css("rotate",  (Math.random() * 10 - Math.random() * 10) + 'deg');
+        cardOnTable = table.children().last().children().last();
+        rotate = (Math.random() * 10 - Math.random() * 10) + 'deg';
+        cardOnTable.css("rotate",  rotate);
         table.children().last().css("width", table.children().last().children().last().css("width"));
         table.children().last().css("height", table.children().last().children().last().css("height"));
-        table.children().last().children().last().attr("suit", card.suit);
-        table.children().last().children().last().attr("value", card.value);
+        cardOnTable.attr("suit", card.suit);
+        cardOnTable.attr("value", card.value);
+        cardOnTable.css("visibility", "hidden");
     }
     else{
         stack.append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt=""/>`);
@@ -414,7 +516,17 @@ function putCardOnTable(card, stack, elem){
         stack.children().last().attr("value", card.value);
     }
     if (elem !== null) {
-        elem.remove();
+        elem.animate({
+            "left": cardOnTable.offset().left + "px",
+            "top": cardOnTable.offset().top + "px",
+            "rotate": rotate,
+            "width": cardOnTable.css("width"),
+        },
+            500 ,
+            () => {
+            elem.remove();
+            cardOnTable.css("visibility", "visible");
+        })
     }
 }
 
