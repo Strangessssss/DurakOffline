@@ -60,7 +60,6 @@ function botAnswers(){
         }
         for (const botCard of botHandTemp) {
             if (canAttack(botCard, stacks[stack][0])) {
-                console.log(123)
                 possibleAnswers.push(botCard);
                 botHandTemp.splice(botHandTemp.indexOf(botCard), 1);
             }
@@ -84,11 +83,10 @@ function botAttacks(){
     let botHandTemp = [...botHand];
     let attackCards = [];
     if (stacks.length === 0){
+        console.log(botHandTemp[getLeastCardIndex(botHandTemp)])
         let value = botHandTemp[getLeastCardIndex(botHandTemp)].value;
-        console.log(value)
         for (const card of botHandTemp) {
             if (card.value === value){
-                console.log(value, card.value)
                 attackCards.push(card);
             }
         }
@@ -159,8 +157,9 @@ function canUse(card1, card2){
 
 function getLeastCardIndex(cards){
     let leastIdx = 0;
-    for (const cardIdx in cards) {
-        if (canAttack(cards[leastIdx], cards[cardIdx])){
+    for (let cardIdx = 1; cardIdx < cards.length; cardIdx++) {
+        // Compare if the current card can be attacked by the least card
+        if (!canAttack(cards[cardIdx], cards[leastIdx])) {
             leastIdx = cardIdx;
         }
     }
@@ -173,7 +172,6 @@ function canAttack(attackCard, lyingCard) {
     let lyingCardTrump = lyingCard.suit === trumpCard.suit;
     // conditions with trump cards
     if (attackCardTrump){
-
         if (lyingCardTrump){
             return cardValue(attackCard) > cardValue(lyingCard);
         }
@@ -199,13 +197,15 @@ function userAttacks(attackCard, lyingCard){
         stacks.push([attackCard]);
     }
     else {
+        console.log(stacks)
+        console.log(stackIdx(lyingCard))
         stacks[stackIdx(lyingCard)].push(attackCard);
     }
 }
 
 function stackIdx(lyingCard){
-    for (const stack in stacks) {
-        if (stacks[parseInt(stack)][0].suit === lyingCard.suit && stacks[parseInt(stack)][0].value === lyingCard.value) {
+    for (const stack of stacks) {
+        if (stack.suit === lyingCard.suit && stack.value === lyingCard.value) {
             return parseInt(stack);
         }
     }
@@ -399,7 +399,7 @@ function dragElement(draggableElem) {
             // sets the logic before putting card on table in html
             userAttacks(card, null);
             // puts card on table ( not on the other card )
-            userPutsCard(card, draggableElem,null);
+            $userAttacks(card, draggableElem,null);
 
             let botAttack = botAnswers()
             for (const answer of botAttack.answers) {
@@ -451,12 +451,12 @@ functionBut.on("click", function() {
     $handOut(userGoesTemp);
     alignCards()
 
-    if (!userGoes)
-        for (const answer of botAttacks()) {
-            setTimeout(() =>{
-                putCardOnTable(answer, null, null)
-            }, Math.random() * 1000);
+    if (!userGoes) {
+        console.log(botAttacks())
+        for (const botAttackCard of botAttacks()) {
+            $botAttacks(botAttackCard)
         }
+    }
 })
 
 function $handOut(userFirst){
@@ -502,7 +502,7 @@ function bat(cardsCount) {
     }
 }
 
-function userPutsCard(card, elem, stack){
+function $userAttacks(card, elem, stack){
     if (stack === null) {
         let cardOnTable;
         let rotate;
@@ -529,6 +529,41 @@ function userPutsCard(card, elem, stack){
             })
     }
 }
+
+function $botAttacks(card){
+    let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
+    let offset = chosenCard.offset();
+    table.append("<div class='stack'>")
+    table.children().last().append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt=""/>`);
+    $("body").append(chosenCard);
+    let lyingCard = table.children().last().children().last();
+    lyingCard.css("translate", "1rem")
+    lyingCard.attr("suit", card.suit);
+    lyingCard.attr("value", card.value);
+    lyingCard.css("visibility", "hidden");
+    chosenCard.css("position", "absolute");
+    chosenCard.css("left", offset.left + "px");
+    chosenCard.css("top", offset.top + "px");
+    chosenCard.attr("src", `${getUrlByCard(card.suit, card.value)}`);
+    chosenCard.css("rotate", "");
+    chosenCard.css("width", lyingCard.css("width"));
+    table.children().last().css("height", chosenCard.css("height"));
+    table.children().last().css("width", chosenCard.css("width"));
+    chosenCard.animate({
+            "left": lyingCard.offset().left + "px",
+            "top": lyingCard.offset().top + "px",
+        },
+        600,
+        () =>
+        {
+            chosenCard.remove();
+            lyingCard.css("visibility", "visible");
+        }
+    )
+    alignCards();
+}
+
+
 
 function putCardOnTable(card, stack, elem){
     let cardOnTable;
