@@ -60,6 +60,7 @@ function botAnswers(){
         }
         for (const botCard of botHandTemp) {
             if (canAttack(botCard, stacks[stack][0])) {
+                console.log(123)
                 possibleAnswers.push(botCard);
                 botHandTemp.splice(botHandTemp.indexOf(botCard), 1);
             }
@@ -82,11 +83,12 @@ function botAnswers(){
 function botAttacks(){
     let botHandTemp = [...botHand];
     let attackCards = [];
-    if (table.length === 0){
+    if (stacks.length === 0){
         let value = botHandTemp[getLeastCardIndex(botHandTemp)].value;
-
+        console.log(value)
         for (const card of botHandTemp) {
             if (card.value === value){
+                console.log(value, card.value)
                 attackCards.push(card);
             }
         }
@@ -133,9 +135,6 @@ function handOut(userFirst){
             userHand.push(card);
         }
     }
-
-    trumpCard = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-    deck.unshift(trumpCard);
 }
 
 function canUse(card1, card2){
@@ -169,10 +168,12 @@ function getLeastCardIndex(cards){
 }
 
 function canAttack(attackCard, lyingCard) {
+
     let attackCardTrump = attackCard.suit === trumpCard.suit;
     let lyingCardTrump = lyingCard.suit === trumpCard.suit;
     // conditions with trump cards
     if (attackCardTrump){
+
         if (lyingCardTrump){
             return cardValue(attackCard) > cardValue(lyingCard);
         }
@@ -188,7 +189,6 @@ function canAttack(attackCard, lyingCard) {
     if (attackCard.suit !== lyingCard.suit){
         return false;
     }
-
     return cardValue(attackCard) > cardValue(lyingCard)
 }
 
@@ -239,6 +239,8 @@ $(function(){
 
     fillDeck();
     handOut(true);
+    trumpCard = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
+    deck.unshift(trumpCard);
 
     for (let i = 0; i < deck.length ; i++) {
         $deck.append("<img class='card-back' draggable='false' src='cards/card-back.png' alt=''>")
@@ -356,8 +358,6 @@ function dragElement(draggableElem) {
         draggableElem.off("mouseup mouseout mousemove");
         draggableElem.removeClass("on-drag");
 
-
-
         // if the card does not appropriate or user puts it wrong way
         if (!IsIn(e.clientX, e.clientY, table.offset().left, table.offset().top, table.outerWidth(), table.outerHeight())) {
             // sets the card's position to 0 to avoid render errors
@@ -399,19 +399,20 @@ function dragElement(draggableElem) {
             // sets the logic before putting card on table in html
             userAttacks(card, null);
             // puts card on table ( not on the other card )
-            putCardOnTable(card, null, draggableElem);
+            userPutsCard(card, draggableElem,null);
 
-            // let botAttack = botAnswers() // RETURN
-            // for (const answer of botAttack.answers) {
-            //     if (answer.answer === undefined){
-            //         continue;
-            //     }
-            //
-            //     setTimeout(() =>{
-            //         putCardOnTable(answer.answer, $(table.children()[answer.lyingCardIdx]), null)
-            //         $botHand.children().last().remove();
-            //     }, Math.random() * 1000);
-            // }
+            let botAttack = botAnswers()
+            for (const answer of botAttack.answers) {
+                if (answer.answer === undefined){
+                    continue;
+                }
+
+                setTimeout(() =>{
+                    putCardOnTable(answer.answer, $(table.children()[answer.lyingCardIdx]), null)
+
+                }, Math.random() * 1000);
+            }
+
             alignCards();
 
             functionBut.css("visibility", "visible");
@@ -448,7 +449,14 @@ functionBut.on("click", function() {
 
     handOut(userGoesTemp);
     $handOut(userGoesTemp);
+    alignCards()
 
+    if (!userGoes)
+        for (const answer of botAttacks()) {
+            setTimeout(() =>{
+                putCardOnTable(answer, null, null)
+            }, Math.random() * 1000);
+        }
 })
 
 function $handOut(userFirst){
@@ -494,6 +502,34 @@ function bat(cardsCount) {
     }
 }
 
+function userPutsCard(card, elem, stack){
+    if (stack === null) {
+        let cardOnTable;
+        let rotate;
+        table.append("<div class='stack'>")
+        table.children().last().append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt="">`);
+        cardOnTable = table.children().last().children().last();
+        rotate = (Math.random() * 10 - Math.random() * 10) + 'deg';
+        cardOnTable.css("rotate", rotate);
+        table.children().last().css("width", table.children().last().children().last().css("width"));
+        table.children().last().css("height", table.children().last().children().last().css("height"));
+        cardOnTable.attr("suit", card.suit);
+        cardOnTable.attr("value", card.value);
+        cardOnTable.css("visibility", "hidden");
+        elem.animate({
+                "left": cardOnTable.offset().left + "px",
+                "top": cardOnTable.offset().top + "px",
+                "rotate": rotate,
+                "width": cardOnTable.css("width"),
+            },
+            300,
+            () => {
+                elem.remove();
+                cardOnTable.css("visibility", "visible");
+            })
+    }
+}
+
 function putCardOnTable(card, stack, elem){
     let cardOnTable;
     let rotate;
@@ -510,10 +546,34 @@ function putCardOnTable(card, stack, elem){
         cardOnTable.css("visibility", "hidden");
     }
     else{
+        let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
+        let offset = chosenCard.offset();
         stack.append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt=""/>`);
-        stack.children().last().css("translate", "1rem")
-        stack.children().last().attr("suit", card.suit);
-        stack.children().last().attr("value", card.value);
+        $("body").append(chosenCard);
+        let lyingCard = stack.children().last();
+        lyingCard.css("translate", "1rem")
+        lyingCard.attr("suit", card.suit);
+        lyingCard.attr("value", card.value);
+        lyingCard.css("visibility", "hidden");
+        chosenCard.css("position", "absolute");
+        chosenCard.css("left", offset.left + "px")
+        chosenCard.css("top", offset.top + "px")
+        chosenCard.attr("src", `${getUrlByCard(card.suit, card.value)}`)
+        chosenCard.css("rotate", "")
+        chosenCard.css("width", lyingCard.css("width"));
+        chosenCard.animate({
+            "left": lyingCard.offset().left + "px",
+            "top": lyingCard.offset().top + "px",
+        },
+            600,
+            () =>
+            {
+                chosenCard.remove();
+                lyingCard.css("visibility", "visible");
+            }
+        )
+        alignCards();
+
     }
     if (elem !== null) {
         elem.animate({
@@ -522,7 +582,7 @@ function putCardOnTable(card, stack, elem){
             "rotate": rotate,
             "width": cardOnTable.css("width"),
         },
-            500 ,
+            300 ,
             () => {
             elem.remove();
             cardOnTable.css("visibility", "visible");

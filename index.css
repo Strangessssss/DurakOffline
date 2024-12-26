@@ -33,15 +33,14 @@ body{
 #table{
     background-color: var(--table-bg-color);
     box-shadow: var(--table-bg-color) 0 0 2rem 50px;
-    height: 15rem;
-    width: 45%;
+    height: 30rem;
+    width: 40rem;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 2rem;
     flex-flow: row wrap;
-    transition: transform 10s ease;
 }
 
 #bat{
