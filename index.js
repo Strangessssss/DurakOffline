@@ -1,309 +1,44 @@
+import Durak from "./durak.js";
 
-////////////////////////////// GAME INFO //////////////////////////////////////////////////
+let durak = new Durak();
 
-const suits = ["clubs", "diamonds", "hearts", "spades"]
-
-const values = {
-    "ace": 600,
-    "king": 500,
-    "queen": 400,
-    "jack": 300,
-    "10": 200,
-    "9": 100,
-    "8": 0,
-    "7": -100,
-    "6": -200,
-    "5": -300,
-    "4": -400,
-    "3": -500,
-    "2": -600
-}
-
-function getUrlByCard(suit, value) {
-    return `cards/English_pattern_${value}_of_${suit}.svg`
-}
-
-////////////////////////////////////////// GAME LOGIC //////////////////////////////////////////////////////
-
-let botSkipsInstantly = false; // if there are cards that bot can answer, it answers not matter whether it does not have cards for the rest
-
-let userGoes;
-let userHand = [];
-let botHand = [];
-
-
-let stacks = [];
-let trumpCard;
-let deck = [];
-
-function fillDeck() {
-    for (const suit of suits) {
-        for (const value in values) {
-            deck.push(
-                {
-                    suit,
-                    value
-                }
-            )
-        }
-    }
-}
-
-function botAnswers(){
-    let botHandTemp = [...botHand];
-    let answers = []
-    let answered;
-    for (const stack in stacks) {
-        let possibleAnswers = []
-        if (stacks[stack].length === 2){
-            continue;
-        }
-        for (const botCard of botHandTemp) {
-            if (canAttack(botCard, stacks[stack][0])) {
-                possibleAnswers.push(botCard);
-                botHandTemp.splice(botHandTemp.indexOf(botCard), 1);
-            }
-        }
-        answers.push({lyingCardIdx: stack, answer: possibleAnswers[getLeastCardIndex(possibleAnswers)]});
-    }
-
-    answered = answers.length === answers.filter(card => card.answer !== undefined).length;
-
-    for (const answer of answers) {
-        if (answer.answer === undefined) {
-            continue;
-        }
-        stacks[answer.lyingCardIdx].push(answer.answer);
-        botHand.splice(botHand.indexOf(answer.answer), 1);
-    }
-    return {answered, answers};
-}
-
-function botAttacks(){
-    let botHandTemp = [...botHand];
-    let attackCards = [];
-    if (stacks.length === 0){
-        let value = botHandTemp[getLeastCardIndex(botHandTemp)].value;
-        for (const card of botHandTemp) {
-            if (card.value === value){
-                attackCards.push(card);
-            }
-        }
-        for (const card of attackCards) {
-            botHand.splice(botHand.indexOf(card), 1);
-            putCardOnTable(card, null, false);
-        }
-        return attackCards;
-    }
-    else{
-        let values = []
-        for (const stack of stacks) {
-            for (const card of stack) {
-                if (!values.includes(card.value)){
-                    values.push(card.value);
-                }
-            }
-        }
-        for (const value of values) {
-            for (const card of botHandTemp) {
-                if (card.value === value){
-                    attackCards.push(card);
-                }
-            }
-        }
-        return attackCards;
-    }
-}
-
-function handOut(userFirst){
-    if (userFirst) {
-        while (userHand.length < 6) {
-            let card = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-            userHand.push(card);
-            console.log(1, userHand);
-        }
-        while (botHand.length < 6) {
-            let card = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-            botHand.push(card);
-        }
-    }
-    else {
-        while (botHand.length < 6) {
-            let card = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-            botHand.push(card);
-        }
-        while (userHand.length < 6) {
-            let card = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-            userHand.push(card);
-            console.log(2, userHand);
-        }
-
-    }
-}
-
-function canUse(card1, card2){
-    if (card2 === null) {
-       if (stacks.length === 0){
-           return true;
-       }
-       for (const stack of stacks) {
-           for (const lyingCard of stack) {
-               if (lyingCard.value === card1.value){
-                   return true;
-               }
-           }
-       }
-       return false;
-   }
-   else{
-        return canAttack(card1, card2);
-   }
-
-}
-
-function getLeastCardIndex(cards){
-    let leastIdx = 0;
-    for (let cardIdx = 1; cardIdx < cards.length; cardIdx++) {
-        // Compare if the current card can be attacked by the least card
-        if (!canAttack(cards[cardIdx], cards[leastIdx])) {
-            leastIdx = cardIdx;
-        }
-    }
-    return leastIdx;
-}
-
-function canAttack(attackCard, lyingCard) {
-
-    let attackCardTrump = attackCard.suit === trumpCard.suit;
-    let lyingCardTrump = lyingCard.suit === trumpCard.suit;
-    // conditions with trump cards
-    if (attackCardTrump){
-        if (lyingCardTrump){
-            return cardValue(attackCard) > cardValue(lyingCard);
-        }
-        return true;
-    }
-
-    // if only lying card is trump card
-    if (lyingCardTrump){
-        return false;
-    }
-
-    // simple cards
-    if (attackCard.suit !== lyingCard.suit){
-        return false;
-    }
-    return cardValue(attackCard) > cardValue(lyingCard)
-}
-
-function putCardOnTable(attackCard, lyingCard, userCard){
-    attackCard.userCard = userCard;
-    if (userCard){
-        userHand.splice(userHand.indexOf(attackCard), 1);
-    }
-    else{
-        botHand.splice(botHand.indexOf(attackCard), 1);
-    }
-    if (lyingCard === null) {
-        stacks.push([attackCard]);
-    }
-    else {
-        stacks[stackIdx(lyingCard)].push(attackCard);
-    }
-}
-
-function stackIdx(lyingCard){
-    for (const stack in stacks) {
-        if (stacks[stack][0].suit === lyingCard.suit && stacks[stack][0].value === lyingCard.value) {
-            return parseInt(stack);
-        }
-    }
-    return -1;
-}
-
-function cardValue(card){
-    return values[card.value]
-}
-
-function allAnswered(){
-    for (const stack of stacks) {
-        if (stack.length === 1){
-            return false;
-        }
-    }
-    return true;
-}
-
-function fromTableToBot(){
-    for (const stack of stacks) {
-        for (const card of stack) {
-            botHand.push(card);
-        }
-    }
+function updateInfo(){
+    console.log("------Update info-------");
+    console.log(durak.userHand);
+    console.log(durak.botHand);
+    console.log(durak.stacks);
 }
 
 ////////////////////////////////////////// HTML LOGIC //////////////////////////////////////////////////////
-
 
 // elements
 let $userHand = $("#user-hand");
 let $botHand = $("#bot-hand");
 let table = $("#table");
 let $deck = $("#deck");
-let functionBut = $("#function");
+let userFunctionBut = $("#user-function");
+let botFunction = $("#bot-function");
 
 $(function(){
-    fillDeck();
-    handOut(true);
-    trumpCard = deck.splice(Math.floor(Math.random() * deck.length), 1)[0];
-    deck.unshift(trumpCard);
-
-    for (let i = 0; i < deck.length ; i++) {
+    for (let i = 0; i < durak.deck.length ; i++) {
         $deck.append("<img class='card-back' draggable='false' src='cards/card-back.png' alt=''>")
         $deck.children().last().css("translate", `-${i*0.3}px -${i*0.3}px`)
     }
     $deck.children().first().attr("src",
-        getUrlByCard(
-            trumpCard.suit,
-            trumpCard.value
+        durak.getUrlByCard(
+            durak.trumpCard.suit,
+            durak.trumpCard.value
         )
     );
 
     $deck.children().first().css("rotate", "90deg")
     $deck.children().first().css("translate", `2rem`)
 
-    handOut(userGoes);
-    $handOut(userGoes);
+    $handOut(durak.userGoes);
 
     // userGoes = isUserFirst(); RETURN
-    userGoes = true;
-
-    alignCards()
+    durak.userGoes = true;
 })
-
-function isUserFirst(){
-    const botTrumpCards = []
-    const userTrumpCards = []
-
-    for (const card of userHand) {
-        if (card.suit === trumpCard.suit){
-            userTrumpCards.push(card);
-        }
-    }
-
-    for (const card of botHand) {
-        if (card.suit === trumpCard.suit){
-            botTrumpCards.push(card);
-        }
-    }
-
-    if (userTrumpCards.length === 0 || botTrumpCards.length === 0) {
-        return Math.floor(Math.random() * 2);
-    }
-    else{
-        return cardValue(botTrumpCards[getLeastCardIndex(botTrumpCards)]) > cardValue(userTrumpCards[getLeastCardIndex(userTrumpCards)]);
-    }
-}
 
 function alignCards(){
     const botHandCards = $botHand.children();
@@ -362,9 +97,11 @@ function dragElement(draggableElem) {
     }
 
     function replaceElem(e) {
+
         // changes the position of card relating to mouse
         draggableElem.css("left", e.clientX - HookX + 'px');
         draggableElem.css("top", e.clientY - HookY + 'px');
+
     }
 
     function putCard(e) {
@@ -397,40 +134,44 @@ function dragElement(draggableElem) {
                 stack.offsetLeft,
                 stack.offsetTop,
                 $stack.outerWidth(),
-                $stack.outerHeight()) && canAttack(card, lyingCard)
+                $stack.outerHeight()) && durak.canAttack(card, lyingCard)
             ) {
-                putCardOnTable(card, lyingCard, true);
+                durak.putCardOnTable(card, lyingCard, true);
 
                 // adds the card to stack
                 $userAnswers(card, $stack, draggableElem)
 
                 let botAttack = $botAttacks();
-                while (botAttack){
-                    if (allAnswered()){
-                        userGoes = true;
-                    }
-                    else{
-                        functionBut.text("I take:(")
-                    }
-                    }
+                while(botAttack){
+                    botAttack = $botAttacks();
+                }
+                if (durak.allAnswered()){
+                    setUserFunctionText(null);
+                    setTimeout(()=> {
+                        $clearTable(true)
+                        setUserFunctionText(null);
+                        durak.userGoes = true;
+                        $handOut();
+                        setTimeout(()=> {setBotFunctionText(null)}, 2000)
+                    }, 1500)
+                }
                 return;
             }
         }
-        if (canUse(card, null) && userGoes){
+        if (durak.canUse(card, null) && durak.userGoes){
 
-            userGoes = true;
+            setUserFunctionText(null)
+
+            durak.userGoes = true;
 
             draggableElem.off("mousedown");
-
             // sets the logic before putting card on table in html
-            putCardOnTable(card, null, true);
+            durak.putCardOnTable(card, null, true);
             // puts card on table ( not on the other card )
             $userAttacks(card, draggableElem,null);
 
             $botAnswers();
 
-            functionBut.css("visibility", "visible");
-            functionBut.text("Bat!")
             return;
         }
         // sets the card's position to 0 to avoid render errors
@@ -442,32 +183,62 @@ function dragElement(draggableElem) {
     }
 }
 
-functionBut.on("click", function() {
-    let userGoesTemp = userGoes;
-    if (userGoes) {
-        if (allAnswered()) {
-            clearTable(true);
-            userGoes = false;
+userFunctionBut.on("click", function() {
+    let userGoesTemp = durak.userGoes;
+    if (durak.userGoes) {
+        if (durak.allAnswered()) {
+            $clearTable(true);
+            durak.userGoes = false;
         }
         else {
-            fromTableToBot();
-            userGoes = true;
-            clearTable(false);
+            durak.fromTableToBot();
+            durak.userGoes = true;
+            $clearTable(false);
+        }
+    }
+    else{
+        if (durak.allAnswered()) {
+            $clearTable(true);
+            durak.userGoes = true;
+        }
+        else {
+            durak.fromTableToUser();
+            durak.userGoes = false;
+            $clearTable(false);
+            setUserFunctionText("Take:(")
         }
     }
 
-    handOut(userGoesTemp);
+
     $handOut(userGoesTemp);
-    alignCards()
-    if (!userGoes) {
+    if (!durak.userGoes) {
         $botAttacks();
     }
 
+
 })
 
+function setUserFunctionText(text){
+    if (text === null){
+        userFunctionBut.css("visibility", "hidden");
+        return;
+    }
+    userFunctionBut.css("visibility", "visible");
+    userFunctionBut.text(text);
+}
+
+function setBotFunctionText(text){
+    if (text === null){
+        botFunction.css("visibility", "hidden");
+        return;
+    }
+    botFunction.css("visibility", "visible");
+    botFunction.text(text);
+}
 
 
 function $handOut(userFirst){
+    durak.handOut(userFirst);
     if (userFirst){
         $fillUserHand()
         $fillBotHand();
@@ -476,38 +247,36 @@ function $handOut(userFirst){
         $fillBotHand();
         $fillUserHand()
     }
-    let difference = $deck.children().length - deck.length;
+    let difference = $deck.children().length - durak.deck.length;
     for (let i = 0; i < difference; i++) {
         $deck.children().last().remove();
     }
+    alignCards();
 }
 
 function $fillUserHand(){
     $userHand.empty();
-    for (const cardIdx in userHand) {
+    for (const cardIdx in durak.userHand) {
         $userHand.append("<img class='card on-hand' draggable='false' src='' alt=''>")
 
-        let {suit, value} = userHand[parseInt(cardIdx)];
+        let {suit, value} = durak.userHand[parseInt(cardIdx)];
         $userHand.children().last().attr("suit", suit)
         $userHand.children().last().attr("value", value)
 
-        let $card = $(".card").eq(parseInt(cardIdx)).attr("src", getUrlByCard(suit, value));
+        let $card = $(".card").eq(parseInt(cardIdx)).attr("src", durak.getUrlByCard(suit, value));
         dragElement($card);
     }
 
 }
 
-function clearTable(fillBat){
-    let count = 0;
-    for (const stack of stacks) {
-        count += stack.length;
-    }
+function $clearTable(fillBat){
+    let count = durak.clearTable();
     for (const stack of table.children()) {
         stack.remove();
     }
     if (fillBat)
         bat(count)
-    stacks = []
+    durak.stacks = []
 }
 
 function bat(cardsCount) {
@@ -525,7 +294,7 @@ function $userAttacks(card, elem){
     let cardOnTable;
     let rotate;
     table.append("<div class='stack'>")
-    table.children().last().append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt="">`);
+    table.children().last().append(`<img class="card on-table" src="${durak.getUrlByCard(card.suit, card.value)}" alt="">`);
     cardOnTable = table.children().last().children().last();
     rotate = (Math.random() * 10 - Math.random() * 10) + 'deg';
     cardOnTable.css("rotate", rotate);
@@ -545,21 +314,25 @@ function $userAttacks(card, elem){
             elem.remove();
             cardOnTable.css("visibility", "visible");
         })
+    $won();
 }
 
 function $botAnswers(){
-    let botAttack = botAnswers()
-
+    let botAttack = durak.botAnswers()
     for (const answer of botAttack.answers) {
         if (answer.answer === undefined){
-            continue;
+            setTimeout(() =>{
+                setUserFunctionText("Bat!")
+                setBotFunctionText("Take:(")
+            }, 1500)
+            return;
         }
-        let card = answer.answer;
-        let stack = $(table.children()[answer.lyingCardIdx]);
-        setTimeout(() =>{
+        setTimeout(() => {
+            let card = answer.answer;
+            let stack = $(table.children()[answer.lyingCardIdx]);
             let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
             let offset = chosenCard.offset();
-            stack.append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt=""/>`);
+            stack.append(`<img class="card on-table" src="${durak.getUrlByCard(card.suit, card.value)}" alt=""/>`);
             $("body").append(chosenCard);
             let lyingCard = stack.children().last();
             SetBotCard(lyingCard, card, offset, chosenCard);
@@ -568,26 +341,38 @@ function $botAnswers(){
                     "top": lyingCard.offset().top + "px",
                 },
                 600,
-                () =>
-                {
+                () => {
                     chosenCard.remove();
                     lyingCard.css("visibility", "visible");
+                    setUserFunctionText("Bat!")
                 }
             )
             alignCards();
+            }, Math.random() * 2500);``
+    }
+    $won();
+}
 
-        }, Math.random() * 1000);
+function $won(){
+    if (durak.won()){
+        console.log("WINNNNNN!!!!!!!!!");
     }
 }
 
 function $botAttacks(){
-    let botAttack = botAttacks();
+    setBotFunctionText(null)
+    let botAttack = durak.botAttacks();
+    let i = 0;
     for (const card of botAttack) {
-        let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
-        let offset = chosenCard.offset();
-        table.append("<div class='stack'>")
-        table.children().last().append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt=""/>`);
-        $("body").append(chosenCard);
+        setTimeout(() => {
+            let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
+            let offset = chosenCard.offset();
+            table
+            .append("<div class='stack'>")
+            table
+            .children().last().append(`<img class="card on-table" src="${durak.getUrlByCard(card.suit, card.value)}" alt=""/>`);
+            $(
+            "body").append(chosenCard);
         let lyingCard = table.children().last().children().last();
 
         SetBotCard(lyingCard, card, offset, chosenCard);
@@ -599,16 +384,18 @@ function $botAttacks(){
                 "top": lyingCard.offset().top + "px",
             },
             600,
-            () =>
-            {
+            () => {
                 chosenCard.remove();
                 lyingCard.css("visibility", "visible");
             }
         )
+            alignCards();
+
+        }, i * 200)
     }
-    functionBut.text("I take:(")
-    alignCards();
-    return botAttacks.length !== 0;
+    userFunctionBut.text("take:(")
+    $won();
+    return durak.botAttacks.length !== 0;
 }
 
 function SetBotCard(lyingCard, card, offset, chosenCard){
@@ -619,7 +406,7 @@ function SetBotCard(lyingCard, card, offset, chosenCard){
     chosenCard.css("position", "absolute");
     chosenCard.css("left", offset.left + "px");
     chosenCard.css("top", offset.top + "px");
-    chosenCard.attr("src", `${getUrlByCard(card.suit, card.value)}`);
+    chosenCard.attr("src", `${durak.getUrlByCard(card.suit, card.value)}`);
     chosenCard.css("rotate", "");
     chosenCard.css("width", lyingCard.css("width"));
 }
@@ -627,7 +414,7 @@ function SetBotCard(lyingCard, card, offset, chosenCard){
 function $userAnswers(card, stack, elem) {
     let cardOnTable;
     let rotate;
-    stack.append(`<img class="card on-table" src="${getUrlByCard(card.suit, card.value)}" alt="">`);
+    stack.append(`<img class="card on-table" src="${durak.getUrlByCard(card.suit, card.value)}" alt="">`);
     cardOnTable = stack.children().last();
     rotate = (Math.random() * 10 - Math.random() * 10) + 'deg';
     cardOnTable.css("rotate", rotate);
@@ -647,11 +434,12 @@ function $userAnswers(card, stack, elem) {
             elem.remove();
             cardOnTable.css("visibility", "visible");
         })
+    $won();
 }
 
 function $fillBotHand(){
     $botHand.empty();
-    for (const i in botHand) {
+    for (const i in durak.botHand) {
         $botHand.append("<img class='card-back bot-card' draggable='false' src='cards/card-back.png' alt=''>")
     }
 }

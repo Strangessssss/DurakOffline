@@ -25,6 +25,28 @@ body{
     rotate: calc(var(--deg));
 }
 
+#info{
+    position: absolute;
+    color: white;
+    top: 8rem;
+}
+
+#bot-function{
+    width: 10rem;
+    height: 10rem;
+    background-color: white;
+    position: absolute;
+    color: black;
+    line-height: 10rem;
+    font-weight: bold;
+    font-size: 3rem;
+    border-radius: 10%;
+    text-align: center;
+    right: 5rem;
+    top: 2rem;
+    visibility: hidden;
+}
+
 .bot-card{
     width: 7rem;
     position: absolute;
@@ -108,7 +130,7 @@ body{
     position: relative;
 }
 
-#function{
+#user-function{
     position: absolute;
     width: 12rem;
     height: 4rem;
