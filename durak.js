@@ -142,6 +142,7 @@ class Durak{
     }
 
     drawCards(targetHand) {
+        let newCards = []
         while (targetHand.length < 6) {
             if (this.deck.length === 0) {
                 break;
@@ -152,16 +153,27 @@ class Durak{
             }
             let card = this.deck.splice(i, 1)[0];
             targetHand.push(card);
+            newCards.push({
+                i: targetHand.length - 1,
+                card: card
+            });
         }
+        return newCards;
     }
 
     handOut(userFirst) {
+        let userNewCards;
+        let botNewCards;
         if (userFirst) {
-            this.drawCards(this.userHand);
-            this.drawCards(this.botHand);
+            userNewCards = this.drawCards(this.userHand);
+            botNewCards = this.drawCards(this.botHand);
         } else {
-            this.drawCards(this.botHand);
-            this.drawCards(this.userHand);
+            botNewCards = this.drawCards(this.botHand);
+            userNewCards = this.drawCards(this.userHand);
+        }
+        return {
+            userNewCards,
+            botNewCardsCount: botNewCards.length,
         }
     }
 
