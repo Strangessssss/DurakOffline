@@ -12,6 +12,19 @@ body{
     overflow: hidden;
 }
 
+#info{
+    width: 30rem;
+    height: 10rem;
+    background-color: darkred;
+    visibility: hidden;
+    position: absolute;
+    text-align: center;
+    line-height: 10rem;
+    font-size: 4rem;
+    border-radius: 2rem;
+    color: white;
+}
+
 .hand{
     display: flex;
     justify-content: center;

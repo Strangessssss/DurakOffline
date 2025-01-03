@@ -20,6 +20,7 @@ $(function(){
         $deck.append("<img class='card-back' draggable='false' src='cards/card-back.png' alt=''>")
         $deck.children().last().css("translate", `-${i*0.3}px -${i*0.3}px`)
     }
+
     $deck.children().first().attr("src",
         durak.getUrlByCard(
             durak.trumpCard.suit,
@@ -73,7 +74,7 @@ function dragElement(draggableElem) {
     let HookX;
     let HookY;
 
-    draggableElem.on("touchstart", function(e) {dragMouseDown(e)});
+    draggableElem.on("mousedown", function(e) {dragMouseDown(e)});
 
     function dragMouseDown(e) {
         // sets the hook ( where mouse took teh card )
@@ -157,7 +158,7 @@ function dragElement(draggableElem) {
                 return;
             }
         }
-        if (durak.canUse(card, null) && durak.userGoes){
+        if (durak.canUse(card, null) && durak.userGoes && ((durak.botHand.length !== 1 && durak.deck.length !== 0) || durak.deck.length === 0)){
 
             setUserFunctionText(null)
 
@@ -189,13 +190,11 @@ userFunctionBut.on("click", function() {
         if (durak.allAnswered()) {
             $clearTable(true);
             durak.userGoes = false;
-
         }
         else {
             $fromTableToBot();
             durak.userGoes = true;
             $clearTable(false);
-
         }
     }
     else{
@@ -216,6 +215,7 @@ userFunctionBut.on("click", function() {
     }
 
     setBotFunctionText(null);
+    setUserFunctionText(null);
 })
 
 function setUserFunctionText(text){
@@ -251,7 +251,6 @@ function $handOut(userFirst){
     for (let i = 0; i < difference; i++) {
         $deck.children().last().remove();
     }
-    alignCards();
 }
 
 function $fillUserHand(newCards){
@@ -265,7 +264,6 @@ function $fillUserHand(newCards){
 
         let $card = $(".card").eq(newCards[cardIdx].i).attr("src", durak.getUrlByCard(suit, value));
 
-        $card.css("visibility", "hidden");
         generalInfo.push({
             idx: cardIdx,
             card: $card,
@@ -279,14 +277,14 @@ function $fillUserHand(newCards){
 }
 
 function $fromTableToUser(){
-    $fromTableTo($userHand, true);
+    $fromTableTo($userHand, true, false);
 }
 
 function $fromTableToBot(){
-    $fromTableTo($botHand, false);
+    $fromTableTo($botHand, false, true);
 }
 
-function $fromTableTo($hand, user){
+function $fromTableTo($hand, user, hide){
     if (user){
         durak.fromTableToUser()
     }
@@ -297,12 +295,24 @@ function $fromTableTo($hand, user){
         let $stack = $(stack);
         for (const card of $stack.children()) {
             let $card = $(card)
+            if (hide){
+                $card.attr("src", "cards/card-back.png");
+                console.log(12345);
+            }
             $hand.append($card);
             $card.attr("draggable", "false");
             $card.css("position", "absolute");
             $card.removeClass("on-table")
-            $card.addClass("on-hand")
-            dragElement($card);
+
+            if (!hide){
+                dragElement($card);
+                $card.addClass("on-hand")
+            }
+            else{
+                $card.addClass("bot-card")
+                $card.addClass("card-back")
+                $card.removeClass("card")
+            }
         }
     }
 }
@@ -346,11 +356,14 @@ function $animateHandingOut(generalInfo, length){
         animatedCard.css("left", $deck.children().last().offset().left + "px");
         animatedCard.css("top", $deck.children().last().offset().top - animatedCard.outerHeight + "px");
         animatedCard.css("visibility", "hidden");
+        $card.css("visibility", "hidden");
+
 
         let time = (length !== null ? length - cardIdx: cardIdx) * 400
 
         setTimeout(function() {
             animatedCard.css("visibility", "visible");
+
             animatedCard.animate({
                 "left": $card.offset().left + "px",
                 "top": $card.offset().top + "px",
@@ -412,7 +425,7 @@ function $userAttacks(card, elem){
             elem.remove();
             cardOnTable.css("visibility", "visible");
         })
-    $won();
+    $won(true);
 }
 
 function $botAnswers(){
@@ -448,18 +461,25 @@ function $botAnswers(){
             alignCards();
             }, Math.random() * 2500);``
     }
-    $won();
+    $won(false);
 }
 
-function $won(){
+function $won(user){
+    let info = $("#info")
     if (durak.won()){
-        console.log("WINNNNNN!!!!!!!!!");
+        info.css("visibility", "visible");
+        console.log(user);
+        if (user){
+            info.text("KRASAVCHIK!!")
+        }
+        else{
+            info.text("LOOOOSEERR!")
+        }
     }
 }
 
 function $botAttacks(){
     setBotFunctionText(null)
-    setUserFunctionText("Take:(")
     let botAttack = durak.botAttacks();
     let i = 0;
     for (const card of botAttack) {
@@ -486,6 +506,7 @@ function $botAttacks(){
         () => {
             chosenCard.remove();
             lyingCard.css("visibility", "visible");
+            setUserFunctionText("Take:(")
         }
         )
             alignCards();
@@ -493,7 +514,7 @@ function $botAttacks(){
         }, 1200)
     }
     userFunctionBut.text("take:(")
-    $won();
+    $won(false);
     return durak.botAttacks.length !== 0;
 }
 
@@ -533,7 +554,7 @@ function $userAnswers(card, stack, elem) {
             elem.remove();
             cardOnTable.css("visibility", "visible");
         })
-    $won();
+    $won(true);
 }
 
 
