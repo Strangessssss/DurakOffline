@@ -82,8 +82,8 @@ function dragElement(draggableElem) {
         HookX = Math.abs(e.clientX - draggableElem.offset().left);
         HookY = Math.abs(e.clientY - draggableElem.offset().top);
 
-        draggableElem.on("mousemove", function(e) {replaceElem(e)});
-        draggableElem.on("mouseup mouseout", function(e) {putCard(e)});
+        draggableElem.on("mousemove touchmove", function(e) {replaceElem(e)});
+        draggableElem.on("mouseup mouseout touchend", function(e) {putCard(e)});
 
         $("body").append(draggableElem);
         draggableElem.removeClass("on-hand");
