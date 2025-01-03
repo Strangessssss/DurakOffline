@@ -74,7 +74,8 @@ function dragElement(draggableElem) {
     let HookX;
     let HookY;
 
-    draggableElem.on("mousedown", function(e) {dragMouseDown(e)});
+    draggableElem.on("mousedown touchstart", function(e) {dragMouseDown(e)});
+    console.log(23)
 
     function dragMouseDown(e) {
         // sets the hook ( where mouse took teh card )
