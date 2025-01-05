@@ -481,6 +481,10 @@ function $won(user){
         else{
             info.text("LOOOOSEERR!")
         }
+        setTimeout(() => {
+            window.location.href = '../index.html';
+
+        }, 3000)
     }
 }
 
