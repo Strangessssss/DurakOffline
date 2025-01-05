@@ -14,6 +14,7 @@ let table = $("#table");
 let $deck = $("#deck");
 let userFunctionBut = $("#user-function");
 let botFunction = $("#bot-function");
+let on = true;
 
 $(function(){
     for (let i = 0; i < durak.deck.length ; i++) {
@@ -74,16 +75,15 @@ function dragElement(draggableElem) {
     let HookX;
     let HookY;
 
-    draggableElem.on("mousedown touchstart", function(e) {dragMouseDown(e)});
-    console.log(23)
+    draggableElem.on("mousedown", function(e) {dragMouseDown(e)});
 
     function dragMouseDown(e) {
         // sets the hook ( where mouse took teh card )
         HookX = Math.abs(e.clientX - draggableElem.offset().left);
         HookY = Math.abs(e.clientY - draggableElem.offset().top);
 
-        draggableElem.on("mousemove touchmove", function(e) {replaceElem(e)});
-        draggableElem.on("mouseup mouseout touchend", function(e) {putCard(e)});
+        draggableElem.on("mousemove", function(e) {replaceElem(e)});
+        draggableElem.on("mouseup mouseout", function(e) {putCard(e)});
 
         $("body").append(draggableElem);
         draggableElem.removeClass("on-hand");
@@ -95,7 +95,6 @@ function dragElement(draggableElem) {
     }
 
     function replaceElem(e) {
-
         // changes the position of card relating to mouse
         draggableElem.css("left", e.clientX - HookX + 'px');
         draggableElem.css("top", e.clientY - HookY + 'px');
@@ -103,6 +102,7 @@ function dragElement(draggableElem) {
     }
 
     function putCard(e) {
+        if (!on) return;
         // gets the current card object from html
         let card = {suit: draggableElem.attr("suit"), value:draggableElem.attr("value")};
         // removes events from card  so that it does not move after mouse is up
@@ -185,6 +185,7 @@ function dragElement(draggableElem) {
 }
 
 userFunctionBut.on("click", function() {
+    if (!on) return;
     let userGoesTemp = durak.userGoes;
     if (durak.userGoes) {
         if (durak.stacks.length === 0) return;
@@ -403,6 +404,7 @@ function $bat(cardsCount) {
 }
 
 function $userAttacks(card, elem){
+    if (!on) return;
     let cardOnTable;
     let rotate;
     table.append("<div class='stack'>")
@@ -430,6 +432,7 @@ function $userAttacks(card, elem){
 }
 
 function $botAnswers(){
+    if (!on) return;
     let botAttack = durak.botAnswers()
     for (const answer of botAttack.answers) {
         if (answer.answer === undefined){
@@ -460,16 +463,17 @@ function $botAnswers(){
                 }
             )
             alignCards();
-            }, Math.random() * 2500);``
+            }, Math.random() * 2500);
     }
     $won(false);
 }
 
 function $won(user){
+    if (!on) return;
     let info = $("#info")
     if (durak.won()){
+        on = false;
         info.css("visibility", "visible");
-        console.log(user);
         if (user){
             info.text("KRASAVCHIK!!")
         }
@@ -480,9 +484,9 @@ function $won(user){
 }
 
 function $botAttacks(){
+    if (!on) return;
     setBotFunctionText(null)
     let botAttack = durak.botAttacks();
-    let i = 0;
     for (const card of botAttack) {
         setTimeout(() => {
             let chosenCard = $($botHand.children()[Math.floor(Math.random() * $botHand.children().length)]);
@@ -533,6 +537,7 @@ function SetBotCard(lyingCard, card, offset, chosenCard){
 }
 
 function $userAnswers(card, stack, elem) {
+    if (!on) return;
     let cardOnTable;
     let rotate;
     stack.append(`<img class="card on-table" src="${durak.getUrlByCard(card.suit, card.value)}" alt="">`);

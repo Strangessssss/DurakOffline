@@ -302,29 +302,6 @@ class Durak{
             }
         }
     }
-
-    isUserFirst() {
-        const botTrumpCards = []
-        const userTrumpCards = []
-
-        for (const card of this.userHand) {
-            if (card.suit === this.trumpCard.suit) {
-                userTrumpCards.push(card);
-            }
-        }
-
-        for (const card of this.botHand) {
-            if (card.suit === this.trumpCard.suit) {
-                botTrumpCards.push(card);
-            }
-        }
-
-        if (userTrumpCards.length === 0 || botTrumpCards.length === 0) {
-            return Math.floor(Math.random() * 2);
-        } else {
-            return this.cardValue(botTrumpCards[this.getLeastCardIndex(botTrumpCards)]) > this.cardValue(userTrumpCards[this.getLeastCardIndex(userTrumpCards)]);
-        }
-    }
 }
 
 export default Durak;
