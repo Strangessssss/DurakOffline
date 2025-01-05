@@ -18,7 +18,7 @@ $((function () {
             return;
         }
 
-        window.location.href = '../game';
+        window.location.href = 'game/index.html';
     });
 
     $('#theme-toggle').on('click', function () {
