@@ -18,10 +18,6 @@ $((function () {
             return;
         }
 
-        window.location.href = 'path_to_your_game.html'; // Redirect to the game page
-    });
-
-    startGame.on('click', function () {
         window.location.href = '../game';
     });
 
