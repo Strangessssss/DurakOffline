@@ -1,0 +1,635 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style-type: none;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header .logo {
+    display: flex;
+    align-items: center;
+}
+
+header .logo img {
+    width: 40px;
+    margin-right: 10px;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+nav ul {
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+nav ul li a:hover {
+    color: #f4b400;
+}
+
+.settings button {
+    background: #f4b400;
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.settings button:hover {
+    background-color: #ff9e00;
+}
+
+main {
+    padding: 40px 20px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.slider {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.slide {
+    min-width: 100%;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+}
+
+section#home .slider {
+    margin-bottom: 20px;
+}
+
+section#home h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+section#home p {
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+footer .social-links a {
+    color: #fff;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+footer .social-links a:hover {
+    color: #f4b400;
+}
+
+footer .partners {
+    font-size: 1.1rem;
+}
+
+#scroll-top {
+    background-color: #f4b400;
+    color: #333;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+}
+
+#scroll-top:hover {
+    background-color: #ff9e00;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+
+    footer .footer-content {
+        flex-direction: column;
+    }
+
+    .slider {
+        flex-direction: column;
+    }
+
+    .slider .slide {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    section#home h2 {
+        font-size: 2rem;
+    }
+
+    .page {
+        padding: 20px;
+    }
+}
+
+.dark-theme {
+    background-color: #333;
+    color: #fff;
+}
+
+.dark-theme header {
+    background-color: #444;
+}
+
+.dark-theme nav ul li a {
+    color: #fff;
+}
+
+.dark-theme .settings button {
+    background-color: #333;
+    color: #fff;
+}
+
+.dark-theme footer {
+    background-color: #222;
+}
+
+.dark-theme footer .social-links a {
+    color: #fff;
+}
+
+.dark-theme footer .partners {
+    color: #fff;
+}
+
+.mobile-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#close-message {
+    background-color: #f44336;
+    color: white;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+#close-message:hover {
+    background-color: #d32f2f;
+}
+
+#rules {
+    background-color: #fff;
+    padding: 40px 20px;
+    margin: 40px auto;
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#rules h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2196F3;
+    margin-bottom: 20px;
+}
+
+#rules p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+#rules ul {
+    margin-left: 20px;
+    list-style-type: square;
+    color: #555;
+    font-size: 1.1em;
+}
+
+#rules ul li {
+    margin-bottom: 10px;
+}
+
+strong {
+    font-weight: bold;
+    color: #333;
+}
+
+#variations {
+    background-color: #fff;
+    padding: 40px 20px;
+    margin: 40px auto;
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#variations h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2196F3;
+    margin-bottom: 20px;
+}
+
+#variations h3 {
+    font-size: 1.8rem;
+    margin-top: 30px;
+    color: #333;
+    border-bottom: 2px solid #2196F3;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+#variations p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+#variations ul {
+    margin-left: 20px;
+    list-style-type: square;
+    color: #555;
+    font-size: 1.1em;
+}
+
+#variations ul li {
+    margin-bottom: 10px;
+}
+
+#variations a {
+    color: #2196F3;
+}
+
+#variations a:hover {
+    text-decoration: underline;
+}
+
+#variations .variation-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-left: 4px solid #2196F3;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
+
+#variations .variation-card h4 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #2196F3;
+}
+
+#variations .variation-card p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+#variations .team-play {
+    background-color: #e8f5e9;
+    padding: 20px;
+    border-left: 4px solid #4CAF50;
+    margin-top: 20px;
+    border-radius: 6px;
+}
+
+#variations .team-play ul {
+    list-style-type: circle;
+    margin-left: 30px;
+}
+
+#variations .team-play ul li {
+    margin-bottom: 10px;
+}
+
+#variations .summary {
+    background-color: #fff3e0;
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 30px;
+    border-left: 4px solid #FF5722;
+}
+
+#variations .summary p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+#home {
+    background-color: #fff;
+    padding: 40px 20px;
+    margin: 40px auto;
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#home h2 {
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2196F3;
+    margin-bottom: 20px;
+}
+
+#home p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: #555;
+    text-align: center;
+}
+
+#home .slider {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+#home .slider .slide {
+    min-width: 100%;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease-in-out;
+}
+
+#home .slider .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#home .slider:hover .slide {
+    transform: scale(1.05);
+}
+
+#home .slider .next, #home .slider .prev {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+#home .slider .next {
+    right: 10px;
+}
+
+#home .slider .prev {
+    left: 10px;
+}
+
+#home .button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#home .button-container button {
+    background-color: #2196F3;
+    color: #fff;
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#home .button-container button:hover {
+    background-color: #1976D2;
+}
+
+#home .button-container button:focus {
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    #home {
+        padding: 30px 15px;
+    }
+
+    #home h2 {
+        font-size: 2rem;
+    }
+
+    #home p {
+        font-size: 1rem;
+    }
+
+    #home .slider .slide {
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    #home {
+        padding: 20px 10px;
+    }
+
+    #home h2 {
+        font-size: 1.7rem;
+    }
+
+    #home p {
+        font-size: 0.9rem;
+    }
+
+    #home .button-container button {
+        font-size: 1rem;
+    }
+
+    #home .slider .slide {
+        height: 180px;
+    }
+}
+
+#contact {
+    background-color: #fff;
+    padding: 40px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+    text-align: center;
+}
+
+#contact h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+#contact p {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+#contact address {
+    font-style: normal;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+#contact address a {
+    color: #f4b400;
+    text-decoration: none;
+}
+
+#contact address a:hover {
+    color: #ff9e00;
+}
+
+#contact .form-container {
+    margin-top: 30px;
+}
+
+#contact .form-container input,
+#contact .form-container textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+#contact .form-container input:focus,
+#contact .form-container textarea:focus {
+    border-color: #f4b400;
+    outline: none;
+}
+
+#contact .form-container button {
+    background-color: #f4b400;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#contact .form-container button:hover {
+    background-color: #ff9e00;
+}
+
+@media (max-width: 768px) {
+    #contact h2 {
+        font-size: 2rem;
+    }
+
+    #contact p {
+        font-size: 1rem;
+    }
+
+    #contact address {
+        font-size: 1rem;
+    }
+}

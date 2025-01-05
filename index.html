@@ -2,9 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rules and guide for the card game Durak">
+    <link rel="stylesheet" href="index.css">
+    <script src="jquery-3.7.1.min.js"></script>
+    <title>Durak Game Guide</title>
 </head>
 <body>
-    <a href="game/index.html"></a>
+<header>
+    <div class="logo">
+        <img src="durakofflogo.png" alt="DurakOff.net">
+        <h1>Durak Game Guide</h1>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#rules">Rules</a></li>
+            <li><a href="#variations">Variations</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="settings">
+        <button id="theme-toggle">Toggle Theme</button>
+        <button id="language-toggle">Switch Language</button>
+        <button id="start-game">Start Game</button>
+    </div>
+</header>
+
+<main id="content">
+    <section id="home" class="page">
+        <h2>Welcome to the Durak Game Guide</h2>
+        <p>Discover the rules, strategies, and variations of the classic card game Durak.</p>
+    </section>
+
+    <section id="rules" class="page hidden">
+        <h2>Rules of Durak</h2>
+        <p>The main objective of the game is to avoid being the last player with cards. Here is a detailed breakdown of how to play:</p>
+
+        <h3>Objective</h3>
+        <p>The primary goal in Durak is to <strong>avoid being the last player with cards</strong>. The player who is left with cards at the end of the game is called the <strong>Durak</strong> (the fool). Players aim to get rid of all their cards by attacking and defending during the rounds.</p>
+
+        <h3>Setup</h3>
+        <ul>
+            <li><strong>Players:</strong> Durak is typically played with 2 to 6 players. The game can be adapted for more players in some variations.</li>
+            <li><strong>Deck:</strong> The game uses a standard 36-card deck (from 6 to Ace in each suit). The cards are shuffled, and each player is dealt 6 cards.</li>
+            <li><strong>Trump Suit:</strong> The bottom card of the deck is revealed after the players are dealt their cards. The suit of this card becomes the <strong>Trump suit</strong>, which is stronger than the other suits.</li>
+        </ul>
+
+        <h3>Card Hierarchy</h3>
+        <p>The cards in Durak have a specific ranking:</p>
+        <ul>
+            <li>Ace is the highest card, followed by King, Queen, Jack, 10, 9, 8, 7, and 6 (the lowest).</li>
+            <li><strong>Trump cards</strong> are always ranked higher than cards from other suits.</li>
+        </ul>
+
+        <h3>Game Flow</h3>
+        <p>The game is played in turns, and each turn involves an attack and a defense phase:</p>
+
+        <h4>1. First Attacker</h4>
+        <p>The player to the dealer's left becomes the first attacker.</p>
+
+        <h4>2. Attack Phase</h4>
+        <p>The attacker plays a single card, which is called the <strong>attack card</strong>. The defender must try to defend against the attack by playing a card of the same suit that is higher than the attack card or a trump card.</p>
+
+        <h4>3. Assisting the Attack</h4>
+        <p>After the defender has played a card, the attacker can add more cards to the attack, but they must be the same rank as a card already on the table.</p>
+
+        <h4>4. Defense Phase</h4>
+        <p>If the defender cannot beat the attack card, they must take it. Otherwise, the defender can block the attack and the round continues. If the defender successfully defends, the attacker and defender both draw new cards from the deck.</p>
+
+        <h4>5. Passing the Turn</h4>
+        <p>If the attacker does not wish to continue the attack, they may pass the turn to the next player, and the game continues in a clockwise direction.</p>
+
+        <h3>Important Rules</h3>
+        <ul>
+            <li><strong>Card Limits:</strong> Players can have a maximum of 6 cards in hand. After each attack, they will draw cards from the deck to maintain 6 cards (if there are cards remaining in the deck).</li>
+            <li><strong>No More Cards:</strong> If the deck runs out, players continue without drawing cards, making the game more strategic as players have fewer cards to choose from.</li>
+        </ul>
+
+        <h3>Winning the Game</h3>
+        <p>The first player to discard all their cards is out of the game. The game continues until only one player remains with cards, and this player becomes the <strong>Durak</strong> and loses the game.</p>
+
+        <h3>Strategy Tips</h3>
+        <ul>
+            <li><strong>Trump Card Usage:</strong> Use your trump cards wisely. While they can save you, using too many early on can leave you vulnerable later.</li>
+            <li><strong>Defensive Play:</strong> Don’t hesitate to take cards if you cannot defend. Sometimes, taking cards temporarily is the best option to avoid losing critical cards.</li>
+            <li><strong>Card Counting:</strong> Keep track of the cards that have been played, especially the trump cards. This will help you anticipate your opponent's moves.</li>
+            <li><strong>Attacking Smartly:</strong> Break your opponent's defenses by attacking with different ranks and suits, and use the right timing to force them into difficult situations.</li>
+        </ul>
+
+        <h3>Variations of Durak</h3>
+        <p>Durak can be played in several exciting variations:</p>
+        <ul>
+            <li><strong>Podkidnoy Durak (Throw-in Durak):</strong> After a successful defense, any player (even the attacker) can add more cards of the same rank to the attack.</li>
+            <li><strong>Peredyshka Durak:</strong> In this variation, players can have a "breathing" round where the game temporarily pauses if a player cannot continue.</li>
+            <li><strong>Komandny Durak (Team Durak):</strong> Players team up and play against each other, collaborating on attacks and defenses.</li>
+            <li><strong>Zombie Durak:</strong> When a player is out of cards, they become a "zombie" who can assist their team by throwing cards back into the game.</li>
+        </ul>
+
+        <h3>Summary of Key Rules</h3>
+        <ul>
+            <li><strong>Objective:</strong> Avoid being the last player with cards (Durak).</li>
+            <li><strong>Trump Suit:</strong> The trump suit beats all other suits.</li>
+            <li><strong>Turns:</strong> The attacker plays first, and the defender must block or take the card.</li>
+            <li><strong>Winning:</strong> The first player to discard all cards is out. The last remaining player with cards becomes the Durak.</li>
+        </ul>
+
+        <p>By following these rules and tips, you can master the game of Durak and outsmart your opponents!</p>
+    </section>
+
+
+    <section id="variations" class="page">
+        <h2>Game Variations</h2>
+        <p>Durak can be played in many different ways, depending on regional rules or the preferences of the players. Here are some popular variations:</p>
+
+        <div class="variation-card">
+            <h4>Podkidnoy Durak</h4>
+            <p>This is the most common variation of Durak. The game proceeds as usual, but there is a key difference: players can "throw" cards onto the attacker if they match the suit or rank of the attacking card. This increases the challenge and the potential number of cards a player must defend against.</p>
+            <ul>
+                <li>The attacker may continue to add cards of the same rank to the defense pile.</li>
+                <li>Defenders must respond with matching suits or higher cards from the trump suit.</li>
+                <li>If the defender cannot defend, they must pick up the cards.</li>
+            </ul>
+        </div>
+
+        <div class="variation-card">
+            <h4>Peredyshka Durak</h4>
+            <p>Peredyshka is a variation where the defender can "pass" or "skip" their turn to another player if they are unable to defend properly. This allows for more dynamic gameplay as players have the option to pass the challenge to someone else.</p>
+            <ul>
+                <li>If the defender cannot make a valid move, they can choose to pass the turn.</li>
+                <li>The next player must either defend or take over the challenge.</li>
+                <li>The game continues until all players are either out of cards or no one can defend.</li>
+            </ul>
+        </div>
+
+        <div class="team-play">
+            <h4>Komandny Durak (Team Play)</h4>
+            <p>Komandny Durak is a team-based version of the game. Players are divided into two teams and work together to outlast the other team. The objective remains the same: avoid being the last player with cards, but the dynamics change as teammates can assist each other.</p>
+            <ul>
+                <li>Players sit in alternating positions, with teammates sitting across from each other.</li>
+                <li>Team members can help each other by defending against attacks.</li>
+                <li>If one teammate is unable to defend, their partner can step in to help, as long as they have valid cards to defend with.</li>
+                <li>When a team member runs out of cards, they must sit out until the game ends.</li>
+            </ul>
+        </div>
+
+        <div class="summary">
+            <h4>Summary of Variations</h4>
+            <p>Durak is a versatile and adaptable game, with different variations that add layers of complexity and fun to the traditional rules. Whether you're playing with a group of friends or competing in a team setting, these variations will provide endless entertainment and challenge. Try them all and see which one you prefer!</p>
+        </div>
+    </section>
+
+
+    <section id="contact" class="page hidden">
+        <h2>Contact Us</h2>
+        <p>Have questions or feedback? Get in touch:</p>
+        <address>
+            Email: <a href="mailto:info@durakguide.com">info@durakguide.com</a><br>
+            Phone: +1 234 567 8900<br>
+            Address: 123 Card Game Lane, Funville, FG 45678
+        </address>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="social-links">
+            <a href="#">Facebook</a>
+            <a href="#">Twitter</a>
+            <a href="#">Instagram</a>
+        </div>
+        <div class="partners">
+            <p>Our partners: Step IT.</p>
+        </div>
+    </div>
+</footer>
+<script src="index.js"></script>
 </body>
 </html>

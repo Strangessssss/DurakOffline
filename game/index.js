@@ -474,6 +474,7 @@ function $won(user){
     if (durak.won()){
         on = false;
         info.css("visibility", "visible");
+        info.css("background-color", "green");
         if (user){
             info.text("KRASAVCHIK!!")
         }
