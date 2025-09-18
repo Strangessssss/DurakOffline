@@ -1,11 +1,10 @@
 import Durak from "./durak.js";
 
-let durak = new Durak();
+const durak = new Durak();
 
 
 ////////////////////////////////////////// HTML LOGIC //////////////////////////////////////////////////////
 
-// flags
 
 // elements
 let $userHand = $("#user-hand");
